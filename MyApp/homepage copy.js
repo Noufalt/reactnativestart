@@ -12,29 +12,21 @@ import {
   Platform,
 } from 'react-native';
 import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
-import {Navigation} from 'react-native-navigation';
+// import TextInputWithValidation from 'react-native-input-validator';
 
 import {color} from 'react-native-reanimated';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import Loader from './loader';
-import {appbuttons} from './appthemes/styles';
 
 export default class Homescreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userName: 'newAcc11@hotmail.com',
-      password: 'Admin@123',
-      loading: false,
+      userName: '',
+      password: '',
     };
   }
 
-  postCallResponse = async () => {
-    //Setting Loading flag to true to show indicator
-    this.setState({
-      loading: true,
-    });
-
+  postCallResponse = () => {
     console.log('***********************************************');
     console.log('UN:' + this.state.userName);
     console.log('PWD:' + this.state.password);
@@ -51,42 +43,25 @@ export default class Homescreen extends Component {
       },
       data: data,
     };
-    try {
-      var serviceResult = await axios(config);
-      // .then(function (response) {
-      //   console.log('*****************Status Code****************');
-      //   console.log(response.status);
-      //   console.log('******************************************');
-      //   console.log(JSON.stringify(response.data));
-      //   alert('Api Call success');
-      // })
-      // .catch(function (error) {
-      //   console.log(error);
-      // });
 
-      var st = serviceResult.status;
-      console.log('****ST*********');
-      console.log(st);
-      if (st == 200) {
-        alert('Success');
-        this.props.navigation.navigate('Profile', {name: 'Jane'});
-      } else alert('Invalid username or password');
-    } catch (e) {
-      alert('Something went wrong:' + e);
-      return {};
-    } finally {
-      // Setting Loading flag to false to hide indicator
-      // setTimeout(() => {
-      //   this.setState({
-      //     loading: false,
-      //   });
-      // }, 2500);
-
-      // Setting Loading flag to false to hide indicator
-      this.setState({
-        loading: false,
+    var serviceResult = axios(config)
+      .then(function (response) {
+        console.log('*****************Status Code****************');
+        console.log(response.status);
+        console.log('******************************************');
+        console.log(JSON.stringify(response.data));
+        alert('Api Call success');
+      })
+      .catch(function (error) {
+        console.log(error);
       });
-    }
+
+    // var st = serviceResult.response.status;
+    // console.log('****ST*********');
+    // console.log(st);
+    // if (st > 200) alert('Success');
+    // else alert('Invalid username or password');
+
     // fetch('https://amneen-test.azurewebsites.net/Token', {
     //   method: 'POST',
     //   headers: {
@@ -108,10 +83,6 @@ export default class Homescreen extends Component {
     // });
   };
 
-  async OnRegisterLabelPressed() {
-    this.props.navigation.navigate('Register', {USER_ID: 100});
-  }
-
   async OnButtonPressed() {
     var uName = this.state.userName;
     var uPass = this.state.password;
@@ -122,6 +93,14 @@ export default class Homescreen extends Component {
     console.log('On Button Pressed Hit');
 
     this.postCallResponse();
+    //var res1=await checkIfUserNameIsValid();
+    //let responseJson=await response.json();
+    //console.log('Response json : '+responseJson)
+    //return responseJson;
+
+    // if (uName.trim() == 'Nouf' && uPass.trim() == 'Password1') {
+    //   this.props.navigation.navigate('Profile', {name: 'Jane'});
+    // } else alert('Invalid username or password');
   }
 
   async checkIfUserNameIsValid() {
@@ -157,35 +136,42 @@ export default class Homescreen extends Component {
   render() {
     return (
       <View style={style.container}>
-        <Loader loading={this.state.loading} />
         {/* <Image source={require('./icons/headerPanel.png')} style={style.imageStyle}/> */}
         <View style={style.subcontainer}>
           <Text style={style.labelStyle}>User name</Text>
+          {/* <TextInputWithValidation
+        onRef={(r) => {
+            this.input = r;
+          }} type='email'
+        onChangeText={(text) => 
+          {this.setState({value: text})}}
+          style={style.input} 
+          placeholder="User Name">
+          <Text>Default</Text>
+      </TextInputWithValidation> */}
           <TextInput
-            value={this.state.userName}
+            text="newAcc11@hotmail.com"
             onChangeText={(text) => this.setState({userName: text})}
             style={style.entryStyle}
             placeholder="User name"
           />
           <Text style={style.labelStyle}>Password</Text>
           <TextInput
-            value={this.state.password}
+            text="Admin@123"
             onChangeText={(text) => this.setState({password: text})}
             secureTextEntry={true}
             style={style.entryStyle}
             placeholder="Password"
           />
+          {/* <Button
+        title="Login"
+        onPress={() => navigation.navigate('Profile', {name: 'Jane'})}/> */}
           <TouchableOpacity
-            style={appbuttons.redbutton}
+            style={style.buttonStyle}
             onPress={async () => await this.OnButtonPressed()}
             underlayColor="#fff">
             <Text style={style.textButtonStyle}>Login</Text>
           </TouchableOpacity>
-          <Text
-            style={style.newuserLabelStyle}
-            onPress={async () => await this.OnRegisterLabelPressed()}>
-            New User ? Register Here
-          </Text>
         </View>
       </View>
     );
@@ -199,8 +185,7 @@ const style = StyleSheet.create({
   },
   subcontainer: {
     flex: 1,
-    justifyContent: 'center',
-    marginTop: -50,
+    marginTop: 50,
     marginLeft: 10,
     marginRight: 10,
     backgroundColor: 'white',
@@ -241,15 +226,6 @@ const style = StyleSheet.create({
 
   imageStyle: {
     height: 180,
-  },
-
-  newuserLabelStyle: {
-    textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 10,
-    color: 'blue',
-    fontWeight: 'bold',
-    fontSize: 15,
   },
 });
 
